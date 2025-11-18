@@ -79,3 +79,39 @@ conda activate sdp_env
 
 # Install dependencies (includes imbalanced-learn and xgboost)
 pip install -r requirements.txt
+
+(Note: requirements.txt should include pandas, scikit-learn, xgboost, imbalanced-learn, tabulate)
+
+Running the Experiments
+1. Run the Improved Method (View Performance Gains):
+
+Bash
+
+python SDP_Paper_Inspired_Oversampling.py
+2. Run the Baseline (View Original Performance):
+
+Bash
+
+python SDP_Paper_Inspired_Baseline_NoSampling.py
+3. Run the Foundation Framework:
+
+Bash
+
+python Advanced_SDP_Framework.py
+5. Key Findings
+Through comparative experiments, we reached the following conclusions:
+
+The Accuracy Trap: In the Baseline experiment (NoSampling), models like AdaBoost achieved 90% Accuracy on the cm1 dataset, but MCC was 0.0. This indicates the model completely failed to identify defects, predicting only "No Defect."
+
+Effectiveness of Oversampling: After introducing Borderline Oversampling, while Accuracy decreased slightly (returning to reality), the MCC metric rose significantly (e.g., from 0.00 to 0.37+). This proves the model truly learned to identify defects.
+
+Model Recommendations:
+
+ExtraTrees and GradientBoosting proved the most robust when combined with oversampling.
+
+Deep MLP showed potential in capturing non-linear features.
+
+6. References
+Verma, A., & Sharma, A. (2024). Software defect prediction: future directions and challenges. Empirical Software Engineering, 29(6), 143.
+
+Chen, W., et al. Estimating Uncertainty in Line-Level Defect Prediction via Perceptual Borderline Oversampling.
