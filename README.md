@@ -1,114 +1,152 @@
-Empirical Study of Software Defect Prediction via Borderline Oversampling
+Software Defect Prediction Framework & Empirical Study on Borderline Oversampling
 1. Project Overview
-This project is a comprehensive empirical study on Software Defect Prediction (SDP). It addresses the critical challenges of class imbalance (skewed distribution) and evaluation validity in software engineering datasets.
+This project establishes a comprehensive empirical research framework for Software Defect Prediction (SDP). It consists of two core components:
 
-Based on recent literature feedback, specifically referencing "Estimating Uncertainty in Line-Level Defect Prediction via Perceptual Borderline Oversampling", this project moves beyond traditional methods by implementing Borderline-SMOTE to synthesize difficult-to-classify samples near the decision boundary.
+Foundation Framework: Based on the paper Software defect prediction: future directions and challenges, implemented in Advanced_SDP_Framework.py to explore the general SDP process.
 
-Key Objectives (Addressing Feedback)
-Algorithm Diversity: Implemented 15+ algorithms, ranging from classic ML (Random Forest, SVM) to advanced Ensemble Learning (Gradient Boosting, ExtraTrees) and Deep Learning (Deep MLP).
+Improved Framework: Addressing the pervasive Class Imbalance (Skewed Distribution) issue in software engineering datasets, this framework introduces the Borderline-SMOTE technique, inspired by the paper "Estimating Uncertainty in Line-Level Defect Prediction via Perceptual Borderline Oversampling".
 
-Robustness: Addressed the "Accuracy Trap" (where 90% accuracy can be misleading) by focusing on MCC (Matthews Correlation Coefficient) and ROC-AUC.
+Core Highlights
+Algorithm Diversity This project implements over 15 algorithms, spanning from classic machine learning to deep learning:
 
-Methodological Innovation: Implemented Borderline Oversampling to actively handle data imbalance, responding to the limitation of "skewed distribution of defect knowledge."
+A. Ensemble Methods - The most robust category
 
-Comprehensive Evaluation: Evaluated across 5 classic PROMISE datasets (cm1, jm1, kc1, kc2, pc1) at the function/module level.
+Random Forest: Bagging-based, reduces variance.
+
+Extra Trees: Extremely Randomized Trees, often superior in variance control.
+
+Gradient Boosting: Iteratively corrects errors of predecessor models.
+
+AdaBoost: Adaptive Boosting, focusing on misclassified samples.
+
+Bagging Classifier: General bootstrap aggregating framework.
+
+XGBoost: Optimized distributed gradient boosting, high performance.
+
+B. Deep Learning
+
+MLPClassifier: Simple structure in the basic framework; Deep MLP (3-layer structure: 100-50-25) in the improved framework to simulate deep feature extraction.
+
+C. Linear & Statistical Models
+
+Logistic Regression: Classic linear baseline.
+
+SGD Classifier: Stochastic Gradient Descent for large-scale data.
+
+Passive Aggressive Classifier: Online learning algorithm for data streams.
+
+LDA (Linear Discriminant Analysis).
+
+QDA (Quadratic Discriminant Analysis).
+
+D. Classic Algorithms
+
+SVC: Support Vector Machine.
+
+GaussianNB: Naive Bayes.
+
+KNeighbors: KNN.
+
+Decision Tree.
+
+Robust Evaluation Abandoning the misleading "Accuracy" metric (to avoid the "Accuracy Trap" in imbalanced data), this project evaluates models using MCC (Matthews Correlation Coefficient), ROC-AUC, and F1-Score.
+
+Methodological Innovation Introduction of Borderline Oversampling to actively handle data skewness. Unlike random oversampling, this method synthesizes new data only for difficult samples near the decision boundary, enhancing the model's sensitivity to defects.
+
+Datasets Validated at the function/module level using 5 classic PROMISE datasets: cm1, jm1, kc1, kc2, pc1.
 
 2. Repository Structure
-This repository contains three distinct frameworks representing different stages of the study:
+This repository contains code frameworks representing three distinct stages of the study, designed for A/B testing:
 
-A. The "Paper-Inspired" Experiment (A/B Test)
-These two files form the core comparative experiment to validate the effectiveness of the proposed method.
+A. Core Contrastive Experiment (Paper-Inspired Experiment)
+These two files form the core experiment to validate the effectiveness of the proposed method.
 
-SDP_Paper_Inspired_Oversampling.py (The Proposed Method)
+SDP_Paper_Inspired_Oversampling.py (Proposed Method)
 
-Core Technique: Implements Borderline-SMOTE to oversample the minority class (defects) specifically near the decision boundary.
+Core Technique: Uses Borderline-SMOTE to oversample minority class samples specifically located at the decision boundary in the training set.
 
-Models: Uses 9 advanced models including GradientBoosting, AdaBoost, ExtraTrees, DeepMLP (3-Layers), LDA, QDA, etc.
+Models: Includes 9 advanced models (GradientBoosting, AdaBoost, DeepMLP, etc.).
 
-Goal: To demonstrate that focusing on borderline samples improves the model's ability to distinguish actual defects (Higher MCC/Recall).
+Goal: To demonstrate that focusing on borderline samples improves MCC and Recall.
 
-SDP_Paper_Inspired_Baseline_NoSampling.py (The Baseline)
+SDP_Paper_Inspired_Baseline_NoSampling.py (Baseline)
 
-Technique: Uses standard preprocessing without any oversampling.
+Technique: Uses standard preprocessing without any oversampling techniques.
 
-Models: Same 9 models as above.
+Models: Identical 9 models as above.
 
-Goal: To serve as a control group. It often achieves high "Accuracy" but low "MCC," proving the "Accuracy Trap" in imbalanced datasets.
+Goal: Serves as the control group. Experiments show high "Accuracy" but low MCC, proving the detriment of imbalanced data.
 
-B. The Foundation Framework
-Advanced_SDP_Framework_v3_Silent.py
+B. Foundation Framework
+Advanced_SDP_Framework.py
 
-Technique: Uses class_weight='balanced' (cost-sensitive learning) instead of sampling.
+Technique: Uses class_weight='balanced' (Cost-Sensitive Learning) instead of sampling.
 
-Models: A different set of 7 classic models (RandomForest, SVM, XGBoost, LogisticRegression, etc.).
+Models: Contains 7 classic models (RandomForest, SVM, XGBoost, etc.).
 
-Output: Optimized for silent execution, producing summary tables for MCC, F1, and ROC-AUC at the end.
+Function: Acts as the foundational validation framework, supporting GridSearchCV and silent output mode.
 
 3. Methodology
 3.1 Data Preprocessing
-Datasets: PROMISE Software Engineering Repository (cm1, jm1, kc1, kc2, pc1).
+Automated Cleaning: Handles ? missing values (using median imputation) and non-numeric features.
 
-Cleaning: Automated handling of missing values (median imputation) and '?' characters.
+Stratified Split: Uses Stratified Train-Test Split to preserve the defect ratio in both training and testing sets.
 
-Stratified Split: 80/20 Train-Test split preserving the class distribution ratio.
+3.2 Core Innovation: Borderline Oversampling
+To address the skewed distribution of defect knowledge, we adopted Borderline-SMOTE. This algorithm categorizes minority samples based on their K-Nearest Neighbors:
 
-3.2 The Core Innovation: Borderline Oversampling
-Addressing the critique that standard evaluation is not comprehensive enough, we adopted the strategy from the reference paper Chen et al.. Instead of random oversampling, Borderline-SMOTE categorizes minority samples into:
+Safe: Surrounded by the same class (Easy to classify).
 
-Safe: Surrounded by minority class (Easy to classify).
+Noise: Surrounded by the opposite class (Likely outliers).
 
-Noise: Surrounded by majority class (Likely outliers).
+Danger (Borderline): Surrounded by mixed classes (The region of interest).
 
-Danger (Borderline): Surrounded by mixed classes.
+Our framework only generates synthetic data for "Danger" samples, forcing classifiers (like Boosting and MLP) to learn sharper decision boundaries.
 
-Our framework only generates synthetic data for the "Danger" samples, forcing the classifiers (Boosters/Deep MLP) to learn sharper decision boundaries.
-
-3.3 Model Construction
-We employed GridSearchCV (Cross-Validation) for all models to optimize hyperparameters, ensuring fair comparison.
-
-Deep Learning: A Multi-Layer Perceptron (MLP) with a 3-layer architecture (100-50-25 neurons) to capture non-linear features.
-
-Ensemble: Extensive use of Boosting (Gradient, Ada) and Bagging (ExtraTrees) to reduce variance and bias.
-
-4. How to Run
+4. Quick Start
 Prerequisites
-Create a Python environment (e.g., using Anaconda) and install the required dependencies:
+It is recommended to use Anaconda. Install the required libraries:
 
 Bash
 
-# Create environment
+# Create and activate environment
 conda create -n sdp_env python=3.10
 conda activate sdp_env
 
-# Install dependencies
-conda install -c conda-forge pandas scikit-learn xgboost imbalanced-learn tabulate
-Running the Experiment
-1. To see the improved performance (Proposed Method):
+# Install dependencies (includes imbalanced-learn and xgboost)
+pip install -r requirements.txt
+(Note: requirements.txt should include pandas, scikit-learn, xgboost, imbalanced-learn, tabulate)
+
+Running the Experiments
+1. Run the Improved Method (View Performance Gains):
 
 Bash
 
 python SDP_Paper_Inspired_Oversampling.py
-2. To see the baseline for comparison (Control Group):
+2. Run the Baseline (View Original Performance):
 
 Bash
 
 python SDP_Paper_Inspired_Baseline_NoSampling.py
-3. To run the standard weighted framework:
+3. Run the Foundation Framework:
 
 Bash
 
-python Advanced_SDP_Framework_v3_Silent.py
-5. Key Findings & Results
-Our empirical results demonstrate a significant trade-off between Accuracy and true predictive power (MCC):
+python Advanced_SDP_Framework.py
+5. Key Findings
+Through comparative experiments, we reached the following conclusions:
 
-The Accuracy Trap: In the Baseline study (NoSampling), models like AdaBoost often achieved 90%+ Accuracy on datasets like cm1, but with an MCC of 0.0. This indicates the model was simply predicting "No Defect" for everything.
+The Accuracy Trap: In the Baseline experiment (NoSampling), models like AdaBoost achieved 90% Accuracy on the cm1 dataset, but MCC was 0.0. This indicates the model completely failed to identify defects, predicting only "No Defect."
 
-Effectiveness of Oversampling: In the Proposed study (Oversampling), Accuracy slightly decreased (e.g., to 75-80%), but MCC rose significantly (e.g., to 0.37+).
+Effectiveness of Oversampling: After introducing Borderline Oversampling, while Accuracy decreased slightly (returning to reality), the MCC metric rose significantly (e.g., from 0.00 to 0.37+). This proves the model truly learned to identify defects.
 
-Best Models:
+Model Recommendations:
 
-ExtraTrees and GradientBoosting consistently performed best when combined with Borderline Oversampling.
+ExtraTrees and GradientBoosting proved the most robust when combined with oversampling.
 
-DeepMLP showed stable performance across varying datasets.
+Deep MLP showed potential in capturing non-linear features.
 
-This confirms that Borderline Oversampling effectively addresses the skewed distribution problem, making the defect prediction models actionable and reliable.
+6. References
+Verma, A., & Sharma, A. (2024). Software defect prediction: future directions and challenges. Empirical Software Engineering, 29(6), 143.
+
+Chen, W., et al. Estimating Uncertainty in Line-Level Defect Prediction via Perceptual Borderline Oversampling.
